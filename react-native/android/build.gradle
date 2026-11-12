@@ -1,0 +1,65 @@
+import groovy.json.JsonSlurper
+
+buildscript {
+  ext.ReactNativeFFmpeg = [
+    minSdkVersion: 24,
+    compileSdkVersion: 36,
+    targetSdkVersion: 36
+  ]
+
+  ext.getExtOrDefault = { prop ->
+    if (rootProject.ext.has(prop)) {
+      return rootProject.ext.get(prop)
+    }
+
+    return ReactNativeFFmpeg[prop]
+  }
+}
+
+apply plugin: "com.android.library"
+// AGP 9 registers the `kotlin` extension itself; applying the plugin on top of it fails.
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+apply plugin: "com.facebook.react"
+
+// The FFmpegKit binaries are built by .github/workflows/native.yml and attached to a GitHub release; JitPack
+// serves each package's AAR as `com.github.wekor:ffmpeg-kit:<release>:<package>` (see jitpack.yml at the repo
+// root). The app picks the package with `ffmpegKit.package` in its gradle.properties, which the Expo config plugin
+// writes; min by default.
+def ffmpegKitRelease = new JsonSlurper().parse(file("../package.json")).ffmpegKit.release
+def ffmpegKitPackages = ["min", "https", "audio", "video", "full"]
+def ffmpegKitPackage = (findProperty("ffmpegKit.package") ?: "min").toString()
+if (!ffmpegKitPackages.contains(ffmpegKitPackage)) {
+  throw new GradleException("ffmpegKit.package is \"${ffmpegKitPackage}\"; use one of ${ffmpegKitPackages.join(", ")}.")
+}
+
+android {
+  namespace "com.wekor.reactnativeffmpeg"
+
+  compileSdkVersion getExtOrDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrDefault("minSdkVersion")
+    targetSdkVersion getExtOrDefault("targetSdkVersion")
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+  maven { url "https://www.jitpack.io" }
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  implementation "com.github.wekor:ffmpeg-kit:${ffmpegKitRelease}:${ffmpegKitPackage}@aar"
+  // `@aar` takes the AAR alone, without its POM's dependencies.
+  implementation "com.arthenica:smart-exception-java:0.2.1"
+}

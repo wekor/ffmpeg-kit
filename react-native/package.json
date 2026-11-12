@@ -1,0 +1,140 @@
+{
+  "name": "@wekor/ffmpeg-kit-react-native",
+  "version": "9.0.2",
+  "description": "FFmpeg and FFprobe for React Native.",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./app.plugin.js": "./app.plugin.js",
+    "./plugin": {
+      "types": "./plugin/build/index.d.ts",
+      "default": "./plugin/build/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "*.podspec",
+    "plugin/build",
+    "app.plugin.js",
+    "!ios/build",
+    "!ios/Frameworks",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "bun run --cwd example",
+    "check": "biome check",
+    "fix": "biome check --write",
+    "format": "biome format --write",
+    "clean": "del-cli lib plugin/build",
+    "prepare": "bob build && tsc -p plugin",
+    "typecheck": "tsc && tsc -p example && tsc -p plugin --noEmit",
+    "test": "bun test src plugin",
+    "build:android:prepare": "bun run example expo prebuild --platform android --no-install",
+    "build:android": "./example/android/gradlew --project-dir example/android app:assembleDebug",
+    "build:ios:prepare": "bun run example expo prebuild --platform ios",
+    "build:ios": "xcodebuild -workspace example/ios/FFmpegExample.xcworkspace -scheme FFmpegExample -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build -quiet"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "ffmpeg",
+    "ffprobe",
+    "ffmpeg-kit",
+    "video",
+    "audio"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wekor/ffmpeg-kit.git",
+    "directory": "react-native"
+  },
+  "author": "wekor",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/wekor/ffmpeg-kit/issues"
+  },
+  "homepage": "https://github.com/wekor/ffmpeg-kit/tree/main/react-native#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.3",
+    "@react-native/babel-preset": "0.88.1",
+    "@types/bun": "^1.4.4",
+    "@types/react": "^19.2.0",
+    "del-cli": "^8.0.1",
+    "expo": "~58.0.24",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-builder-bob": "^0.44.1",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": ">=0.80.0"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
+  },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "bun@1.4.4",
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "codegenConfig": {
+    "name": "ReactNativeFFmpegSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.wekor.reactnativeffmpeg"
+    }
+  },
+  "ffmpegKit": {
+    "release": "native-9.0.2",
+    "iosSha256": {
+      "min": "97b42bc00dc740fb36684c569af7ee42a4dbce101e1a53a6429ab203db23a506",
+      "https": "c8f7a764852059e2e0bc1d12df8e8cc5a615349c544cc3ad4038f0cb8cfaef40",
+      "audio": "a7b7d540e14da0828d76141fba83c0123ac2e3217f49ee32702f1111ff4f1eb1",
+      "video": "0963e90df81135b852187755961e8276306eca2f3781afeb8c9ed202b6a49d10",
+      "full": "8416ff0aa80187688134db9b045d78037e341c0c32b77c611c3fbd605db68588"
+    }
+  }
+}

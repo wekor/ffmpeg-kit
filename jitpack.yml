@@ -1,0 +1,12 @@
+# JitPack serves the FFmpegKit Android AARs as com.github.wekor:ffmpeg-kit:<tag>:<package>@aar, one classifier per
+# package (min, https, audio, video, full); without a classifier it serves min. It builds nothing: the AARs and the
+# POM are built by .github/workflows/native.yml and attached to the GitHub release of the same tag. The POM's
+# coordinates are replaced with JitPack's ($GROUP, $ARTIFACT, $VERSION).
+jdk:
+  - openjdk17
+install:
+  - curl --fail --location --silent --show-error --retry 3 -o ffmpeg-kit.pom "https://github.com/wekor/ffmpeg-kit/releases/download/${VERSION}/ffmpeg-kit-android.pom"
+  - perl -0pi -e 's|<groupId>[^<]*<|<groupId>$ENV{GROUP}<|; s|<artifactId>[^<]*<|<artifactId>$ENV{ARTIFACT}<|; s|<version>[^<]*<|<version>$ENV{VERSION}<|' ffmpeg-kit.pom
+  - for package in min https audio video full; do curl --fail --location --silent --show-error --retry 3 -o "ffmpeg-kit-${package}.aar" "https://github.com/wekor/ffmpeg-kit/releases/download/${VERSION}/ffmpeg-kit-${package}-android.aar" || exit 1; done
+  - mvn -q install:install-file -Dfile=ffmpeg-kit-min.aar -DpomFile=ffmpeg-kit.pom
+  - for package in min https audio video full; do mvn -q install:install-file -Dfile="ffmpeg-kit-${package}.aar" -DpomFile=ffmpeg-kit.pom -Dclassifier="${package}" -Dpackaging=aar || exit 1; done

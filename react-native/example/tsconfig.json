@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "paths": {
+      "@wekor/ffmpeg-kit-react-native": ["../src/index"]
+    }
+  },
+  "exclude": ["node_modules", "ios", "android"]
+}
